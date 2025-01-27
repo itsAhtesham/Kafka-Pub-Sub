@@ -17,7 +17,7 @@ app.get('/health', (req, res) => {
 })
 
 app.use(express.json());
-app.post('/produce', async (req, res) => {
+app.post('/send-message', async (req, res) => {
     const { message } = req.body;
   
     if (!message) {
