@@ -1,7 +1,12 @@
-import kafka from "./kafka.js";
 import express from 'express';
+import { Kafka } from "kafkajs";
 
 const app = new express();
+
+const kafka = new Kafka({
+    clientId: "KafkaProducer",
+    brokers: ['localhost:9092']
+});
 
 const producer = kafka.producer();
 
@@ -26,7 +31,7 @@ app.post('/send-message', async (req, res) => {
   
     try {
       await producer.send({
-        topic: 'topic',
+        topic: 'chat-topic',
         messages: [{ value: message }],
       });
 
@@ -47,7 +52,7 @@ errorTypes.forEach(type => {
     try {
       console.log(`process.on ${type}`)
       console.error(e)
-      await consumer.disconnect()
+      await producer.disconnect()
       process.exit(0)
     } catch (_) {
       process.exit(1)
@@ -58,7 +63,7 @@ errorTypes.forEach(type => {
 signalTraps.forEach(type => {
   process.once(type, async () => {
     try {
-      await consumer.disconnect()
+      await producer.disconnect()
     } finally {
       process.kill(process.pid, type)
     }

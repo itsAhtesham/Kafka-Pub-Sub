@@ -1,8 +1,13 @@
 import express from "express";
-import kafka from "./kafka.js";
+import { Kafka } from "kafkajs";
 
 const app = express();
-const port = 3002;
+const PORT = 3002;
+
+const kafka = new Kafka({
+    clientId: "KafkaConsumer2",
+    brokers: ['localhost:9092']
+});
 
 const consumer = kafka.consumer({ groupId: 'group' + Math.random() });
 
@@ -10,7 +15,7 @@ const consumer = kafka.consumer({ groupId: 'group' + Math.random() });
   try {
     await consumer.connect();
     console.log('Consumer 2 connected to Kafka');
-    await consumer.subscribe({ topic: 'topic', fromBeginning: true });
+    await consumer.subscribe({ topic: 'chat-topic', fromBeginning: true });
 
     await consumer.run({
       eachMessage: async ({ topic, message }) => {
@@ -48,6 +53,6 @@ signalTraps.forEach(type => {
   })
 })
 
-app.listen(port, () => {
-  console.log(`Consumer 2 server running at http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Consumer 2 server running at http://localhost:${PORT}`);
 });
